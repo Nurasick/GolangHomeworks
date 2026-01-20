@@ -22,7 +22,7 @@ func NewAuthService(repo *repository.UserRepository) *AuthService {
 }
 
 // Register creates a new user with the given email and password. Returns the created user or an error.
-func (s *AuthService) Register(email, password string) (*model.User, error) {
+func (s *AuthService) Register(email, password, username string, roleID int) (*model.User, error) {
 	_, err := mail.ParseAddress(email) //validating email
 	if err != nil {
 		return nil, err
@@ -35,7 +35,19 @@ func (s *AuthService) Register(email, password string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.Repo.CreateUser(email, string(passwordHash))
+	var newUser = &model.User{
+		Email:        email,
+		PasswordHash: string(passwordHash),
+		Username:     username,
+		RoleID:       roleID,
+		Status:       model.ActiveStatus,
+	}
+	userID, err := s.Repo.CreateUser(newUser)
+	if err != nil {
+		return nil, errors.New("Failed to create a user")
+	}
+	newUser.ID = userID
+	return newUser, nil
 }
 
 // Login authenticates a user with the given email and password. Should return a jwt token if success
