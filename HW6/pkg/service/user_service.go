@@ -26,3 +26,11 @@ func (r *UserService) GetCurrentUser(id int) (*model.MeResponse, error) {
 		Email: user.Email,
 	}, nil
 }
+
+func (r *UserService) UpdateCurrentUser(user *model.User) error {
+	return r.Repo.UpdateUser(user)
+}
+
+func (r *UserService) DeactivateCurrentUser(id int) error {
+	return r.Repo.DeactivateUser(id)
+}

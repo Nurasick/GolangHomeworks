@@ -28,7 +28,10 @@ func (r *UserRepository) MarkAttendance(attendance *model.Attendance) error {
 
 func (r *UserRepository) GetAttendanceByStudentID(studentID int) ([]model.Attendance, error) {
 	query := `
-	select id, student_id, subject_id, visit_day, visited from attendance where student_id = $1;
+	select a.id, a.student_id, s.name, a.subject_id, sub.name, a.visit_day, a.visited from attendance a
+	join students s on a.student_id = s.id
+	join subjects sub on a.subject_id = sub.id
+	where a.student_id = $1;
 	`
 	rows, err := r.Conn.Query(context.Background(), query, studentID)
 	if err != nil {
@@ -39,7 +42,7 @@ func (r *UserRepository) GetAttendanceByStudentID(studentID int) ([]model.Attend
 	var attendances []model.Attendance
 	for rows.Next() {
 		var attendance model.Attendance
-		err := rows.Scan(&attendance.ID, &attendance.StudentID, &attendance.SubjectID, &attendance.VisitDay, &attendance.Visited)
+		err := rows.Scan(&attendance.ID, &attendance.StudentID, &attendance.StudentName, &attendance.SubjectID, &attendance.SubjectName, &attendance.VisitDay, &attendance.Visited)
 		if err != nil {
 			return nil, errors.New("Failed to scan attendance row: " + err.Error())
 		}

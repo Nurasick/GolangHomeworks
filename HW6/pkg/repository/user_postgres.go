@@ -47,7 +47,7 @@ func (r *UserRepository) CreateUser(user *model.User) (int, error) {
 
 	err := r.Conn.QueryRow(context.Background(), query, user.Email, user.PasswordHash, user.Username, user.RoleID, user.Status).Scan(&id, &createdAt, &updatedAt)
 	if err != nil {
-		fmt.Errorf("failed to create the user: %w", err)
+		fmt.Printf("failed to create the user: %w", err)
 		return 0, errors.New("failed to create the user: " + err.Error()) //returning error
 	}
 	user.ID = id
@@ -61,7 +61,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	var user model.User
 	err := r.Conn.QueryRow(context.Background(), query, email).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.PasswordHash, &user.CreatedAt, &user.Status)
 	if err != nil {
-		fmt.Errorf("Failed to get user by email: %w", err)
+		fmt.Printf("Failed to get user by email: %w", err)
 		return nil, errors.New("Failed to get user by email: " + err.Error())
 	}
 	return &user, nil
@@ -72,7 +72,7 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 	var user model.User
 	err := r.Conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		fmt.Errorf("Failed to get user by ID: %w", err)
+		fmt.Printf("Failed to get user by ID: ", err)
 		return nil, errors.New("Failed to get user by ID: " + err.Error())
 	}
 	return &user, nil
@@ -82,7 +82,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 	query := `UPDATE users SET email=$1, username=$2, role_id=$3, status=$4, updated_at=$5 WHERE id=$6;`
 	_, err := r.Conn.Exec(context.Background(), query, user.Email, user.Username, user.RoleID, user.Status, time.Now(), user.ID)
 	if err != nil {
-		fmt.Errorf("Failed to update user: %w", err)
+		fmt.Printf("Failed to update user: ", err)
 		return errors.New("Failed to update user: " + err.Error())
 	}
 	return nil
@@ -92,7 +92,7 @@ func (r *UserRepository) DeactivateUser(id int) error {
 	query := `UPDATE users SET status=$1, updated_at=$2 WHERE id=$3;`
 	_, err := r.Conn.Exec(context.Background(), query, model.InactiveStatus, time.Now(), id)
 	if err != nil {
-		fmt.Errorf("Failed to deactivate user: %w", err)
+		fmt.Printf("Failed to deactivate user: ", err)
 		return errors.New("Failed to deactivate user: " + err.Error())
 	}
 	return nil
