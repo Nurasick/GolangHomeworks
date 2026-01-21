@@ -27,6 +27,7 @@ func JWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID) //setting user ID in context
+		c.Set("roleID", claims.RoleID)
 		return next(c)
 	}
 }

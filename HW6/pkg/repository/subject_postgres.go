@@ -4,46 +4,55 @@ import (
 	"context"
 	"errors"
 	"university/model"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type SubjectRepositoryInterface interface {
-	CreateSubject(subject *model.Subject) error
-	GetSubjectByID(id int) (*model.Subject, error)
-	GetAllSubject() ([]model.Subject, error)
+	CreateSubject(*model.Subject) error
+	GetSubjectByID(int) (*model.Subject, error)
+	GetAllSubjects() ([]model.Subject, error)
+}
+type SubjectRepository struct {
+	conn *pgx.Conn
 }
 
-func (r *UserRepository) CreateSubject(subject *model.Subject) (int, error) {
+func NewSubjectRepository(conn *pgx.Conn) *SubjectRepository {
+	return &SubjectRepository{conn: conn}
+}
+
+func (r *SubjectRepository) CreateSubject(subject *model.Subject) error {
 	var id int
 	query := `
 	insert into subjects(name)
 	values($1) returning id
 	`
-	err := r.Conn.QueryRow(context.Background(), query, subject.Name).Scan(&id)
+	err := r.conn.QueryRow(context.Background(), query, subject.Name).Scan(&id)
 	if err != nil {
-		return 0, errors.New("Failed to create a subject: " + err.Error())
+		return errors.New("Failed to create a subject: " + err.Error())
 	}
 
-	return id, nil
+	return nil
 }
 
-func (r *UserRepository) GetSubjectByID(id int) (model.Subject, error) {
+func (r *SubjectRepository) GetSubjectByID(id int) (*model.Subject, error) {
 	query := `select id, name from subjects where id=$1;`
 
 	var subject model.Subject
-	err := r.Conn.QueryRow(context.Background(), query, id).Scan(
+	err := r.conn.QueryRow(context.Background(), query, id).Scan(
 		&subject.ID, &subject.Name,
 	)
 	if err != nil {
-		return model.Subject{}, errors.New("Failed to get a subject by ID: " + err.Error())
+		return &model.Subject{}, errors.New("Failed to get a subject by ID: " + err.Error())
 	}
-	return subject, nil
+	return &subject, nil
 }
 
-func (r *UserRepository) GetAllSubjects() ([]model.Subject, error) {
+func (r *SubjectRepository) GetAllSubjects() ([]model.Subject, error) {
 	query := `select id, name from subjects;`
 
 	var subjects []model.Subject
-	rows, err := r.Conn.Query(context.Background(), query)
+	rows, err := r.conn.Query(context.Background(), query)
 	if err != nil {
 		return nil, errors.New("Failed to retrieve subjects: " + err.Error())
 	}

@@ -1,0 +1,719 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "University Management System API",
+        "title": "University API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/attendance/attendanceByStudentID/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve all attendance records for a specific student",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Get attendance by student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.AttendanceResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/attendanceBySubjectID/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve all attendance records for a specific subject",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Get attendance by subject",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Subject ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.AttendanceResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/subject": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Mark attendance for a student in a subject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance"
+                ],
+                "summary": "Mark attendance",
+                "parameters": [
+                    {
+                        "description": "Attendance Record",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Attendance"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Login with email and password to get JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "Login Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Create a new user account with email and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "Register Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.RegisterResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schedule/all_class_schedule": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve all schedules",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Get all schedule",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Schedule"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schedule/group/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve schedule for a specific group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Get group schedule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Schedule"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/student/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve student information by user ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.StudentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/student/{id}/attendance": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get attendance records for the current student",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student attendance",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.AttendanceResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get the authenticated user's profile information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get current user information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Attendance": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "student_id": {
+                    "type": "integer"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "integer"
+                },
+                "subject_name": {
+                    "type": "string"
+                },
+                "visit_day": {
+                    "type": "string"
+                },
+                "visited": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.AttendanceResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "student_name": {
+                    "type": "string"
+                },
+                "subject_name": {
+                    "type": "string"
+                },
+                "visit_day": {
+                    "type": "string"
+                },
+                "visited": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RegisterRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Schedule": {
+            "type": "object",
+            "properties": {
+                "day_of_week": {
+                    "type": "integer"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "starts_at": {
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "integer"
+                },
+                "teacher_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.StudentResponse": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "group_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

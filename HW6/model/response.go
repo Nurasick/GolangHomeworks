@@ -8,6 +8,6 @@ type AuthResponse struct {
 type MeResponse struct {
 	ID       int    `json:"id"`
 	Email    string `json:"email"`
-	Role     string `json:"role"`
+	Role     int    `json:"role"`
 	Username string `json:"username"`
 }

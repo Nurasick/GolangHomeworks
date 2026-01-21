@@ -3,18 +3,44 @@ package service
 import (
 	"errors"
 	"university/model"
+	"university/pkg/repository"
 )
 
-func (r *UserService) CreateStudent(student *model.Student) (*model.Student, error) {
+type StudentServiceInterface interface {
+	CreateStudent(student *model.Student) (*model.Student, error)
+	GetStudentByID(id int) (*model.Student, error)
+	GetStudentByUserID(id int) (*model.Student, error)
+	GetStudentAttendance(studentID int) ([]model.AttendanceResponse, error)
+}
+
+type StudentService struct {
+	studentRepo    repository.StudentRepositoryInterface
+	userRepo       repository.UserRepositoryInterface
+	attendanceRepo repository.AttendanceRepositoryInterface
+}
+
+func NewStudentService(
+	studentRepo *repository.StudentRepository,
+	userRepo *repository.UserRepository,
+	attendanceRepo *repository.AttendanceRepository,
+) *StudentService {
+	return &StudentService{
+		studentRepo:    studentRepo,
+		userRepo:       userRepo,
+		attendanceRepo: attendanceRepo,
+	}
+}
+
+func (r *StudentService) CreateStudent(student *model.Student) (*model.Student, error) {
 	userID := student.UserId
-	user, err := r.Repo.GetUserByID(userID)
+	user, err := r.userRepo.GetUserByID(userID)
 	if err != nil || user == nil {
 		return nil, errors.New("User does not exist: " + err.Error())
 	}
 	if user.RoleID != 3 {
 		return nil, errors.New("User is not a student: ")
 	}
-	studentID, err := r.Repo.CreateStudent(student)
+	studentID, err := r.studentRepo.CreateStudent(student)
 	if err != nil {
 		return nil, errors.New("Failed to create student: " + err.Error())
 	}
@@ -22,24 +48,24 @@ func (r *UserService) CreateStudent(student *model.Student) (*model.Student, err
 	return student, nil
 }
 
-func (r *UserService) GetStudentByID(id int) (*model.Student, error) {
-	student, err := r.Repo.GetStudentByID(id)
+func (r *StudentService) GetStudentByID(id int) (*model.Student, error) {
+	student, err := r.studentRepo.GetStudentByID(id)
 	if err != nil {
 		return nil, errors.New("Failed to get student: " + err.Error())
 	}
-	return &student, nil
+	return student, nil
 }
 
-func (r *UserService) GetStudentByUserID(id int) (*model.Student, error) {
-	student, err := r.Repo.GetStudentByUserID(id)
+func (r *StudentService) GetStudentByUserID(id int) (*model.Student, error) {
+	student, err := r.studentRepo.GetStudentByUserID(id)
 	if err != nil {
 		return nil, errors.New("Failed to get student: " + err.Error())
 	}
-	return &student, nil
+	return student, nil
 }
 
-func (r *UserService) GetStudentAttendance(studentID int) ([]model.AttendanceResponse, error) {
-	attendances, err := r.Repo.GetAttendanceByStudentID(studentID)
+func (r *StudentService) GetStudentAttendance(studentID int) ([]model.AttendanceResponse, error) {
+	attendances, err := r.attendanceRepo.GetAttendanceByStudentID(studentID)
 	if err != nil {
 		return nil, errors.New("Failed to get student attendance: " + err.Error())
 	}

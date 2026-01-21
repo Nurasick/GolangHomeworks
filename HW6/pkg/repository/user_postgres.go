@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 	"university/model"
@@ -27,17 +26,17 @@ type UserRepositoryInterface interface {
 }
 
 type UserRepository struct {
-	Conn *pgx.Conn
+	conn *pgx.Conn
 }
 
 // NewUserRepository creates a new instance of UserRepository
 func NewUserRepository(conn *pgx.Conn) *UserRepository {
-	return &UserRepository{Conn: conn}
+	return &UserRepository{conn: conn}
 }
 
 // creating a new user in the database
 func (r *UserRepository) CreateUser(user *model.User) (int, error) {
-	query := `INSERT INTO users (email,password_hash,username, role_id, status)
+	query := `INSERT INTO users (email,password_hash,username, role_id, status_id)
 	VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at, updated_at;`
 	//query to insert the user
 
@@ -45,10 +44,9 @@ func (r *UserRepository) CreateUser(user *model.User) (int, error) {
 	var createdAt time.Time
 	var updatedAt time.Time
 
-	err := r.Conn.QueryRow(context.Background(), query, user.Email, user.PasswordHash, user.Username, user.RoleID, user.Status).Scan(&id, &createdAt, &updatedAt)
+	err := r.conn.QueryRow(context.Background(), query, user.Email, user.PasswordHash, user.Username, user.RoleID, user.Status).Scan(&id, &createdAt, &updatedAt)
 	if err != nil {
-		fmt.Printf("failed to create the user: %w", err)
-		return 0, errors.New("failed to create the user: " + err.Error()) //returning error
+		return 0, fmt.Errorf("failed to create the user: %w", err) //returning error
 	}
 	user.ID = id
 	user.CreatedAt = createdAt
@@ -57,43 +55,39 @@ func (r *UserRepository) CreateUser(user *model.User) (int, error) {
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
-	query := `Select id, email,username, role_id, password_hash, created_at, status FROM users Where email = $1;` //SQL
+	query := `Select id, email,username, role_id, password_hash, created_at, status_id FROM users Where email = $1;` //SQL
 	var user model.User
-	err := r.Conn.QueryRow(context.Background(), query, email).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.PasswordHash, &user.CreatedAt, &user.Status)
+	err := r.conn.QueryRow(context.Background(), query, email).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.PasswordHash, &user.CreatedAt, &user.Status)
 	if err != nil {
-		fmt.Printf("Failed to get user by email: %w", err)
-		return nil, errors.New("Failed to get user by email: " + err.Error())
+		return nil, fmt.Errorf("Failed to get user by email: %w", err)
 	}
 	return &user, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
-	query := `Select id, email, username, role_id, created_at, updated_at FROM users Where id = $1;`
+	query := `Select id, email, username, role_id, created_at, updated_at,status_id FROM users Where id = $1;`
 	var user model.User
-	err := r.Conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.CreatedAt, &user.UpdatedAt)
+	err := r.conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.CreatedAt, &user.UpdatedAt, &user.Status)
 	if err != nil {
-		fmt.Printf("Failed to get user by ID: ", err)
-		return nil, errors.New("Failed to get user by ID: " + err.Error())
+		return nil, fmt.Errorf("Failed to get user by ID: %w", err)
 	}
 	return &user, nil
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
-	query := `UPDATE users SET email=$1, username=$2, role_id=$3, status=$4, updated_at=$5 WHERE id=$6;`
-	_, err := r.Conn.Exec(context.Background(), query, user.Email, user.Username, user.RoleID, user.Status, time.Now(), user.ID)
+	query := `UPDATE users SET email=$1, username=$2, role_id=$3, status_id=$4, updated_at=$5 WHERE id=$6;`
+	_, err := r.conn.Exec(context.Background(), query, user.Email, user.Username, user.RoleID, user.Status, time.Now(), user.ID)
 	if err != nil {
-		fmt.Printf("Failed to update user: ", err)
-		return errors.New("Failed to update user: " + err.Error())
+		return fmt.Errorf("Failed to update user: %w", err)
 	}
 	return nil
 }
 
 func (r *UserRepository) DeactivateUser(id int) error {
 	query := `UPDATE users SET status=$1, updated_at=$2 WHERE id=$3;`
-	_, err := r.Conn.Exec(context.Background(), query, model.InactiveStatus, time.Now(), id)
+	_, err := r.conn.Exec(context.Background(), query, model.InactiveStatus, time.Now(), id)
 	if err != nil {
-		fmt.Printf("Failed to deactivate user: ", err)
-		return errors.New("Failed to deactivate user: " + err.Error())
+		return fmt.Errorf("Failed to deactivate user: %w", err)
 	}
 	return nil
 }
