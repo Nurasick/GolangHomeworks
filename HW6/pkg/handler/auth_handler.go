@@ -35,7 +35,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	if err := c.Bind(&req); err != nil { //binding the request body to struct
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request: " + err.Error()})
 	}
-	user, err := h.AuthService.Register(req.Email, req.Password, req.Username, 1) //RoleID is 1 for now as i do not know how to make them separate and when to pass //calling the Register method of AuthService
+	user, err := h.AuthService.Register(req.Email, req.Password, req.RoleID) //RoleID is 1 for now as i do not know how to make them separate and when to pass //calling the Register method of AuthService
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

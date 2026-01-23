@@ -612,9 +612,6 @@
                 },
                 "role_id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -700,9 +697,6 @@
                     "type": "integer"
                 },
                 "updated_at": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

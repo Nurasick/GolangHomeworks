@@ -36,15 +36,15 @@ func NewUserRepository(conn *pgx.Conn) *UserRepository {
 
 // creating a new user in the database
 func (r *UserRepository) CreateUser(user *model.User) (int, error) {
-	query := `INSERT INTO users (email,password_hash,username, role_id, status_id)
-	VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at, updated_at;`
+	query := `INSERT INTO users (email,password_hash, role_id, status_id)
+	VALUES ($1,$2,$3,$4) RETURNING id, created_at, updated_at;`
 	//query to insert the user
 
 	var id int
 	var createdAt time.Time
 	var updatedAt time.Time
 
-	err := r.conn.QueryRow(context.Background(), query, user.Email, user.PasswordHash, user.Username, user.RoleID, user.Status).Scan(&id, &createdAt, &updatedAt)
+	err := r.conn.QueryRow(context.Background(), query, user.Email, user.PasswordHash, user.RoleID, user.Status).Scan(&id, &createdAt, &updatedAt)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create the user: %w", err) //returning error
 	}
@@ -55,9 +55,9 @@ func (r *UserRepository) CreateUser(user *model.User) (int, error) {
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
-	query := `Select id, email,username, role_id, password_hash, created_at, status_id FROM users Where email = $1;` //SQL
+	query := `Select id, email, role_id, password_hash, created_at, status_id FROM users Where email = $1;` //SQL
 	var user model.User
-	err := r.conn.QueryRow(context.Background(), query, email).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.PasswordHash, &user.CreatedAt, &user.Status)
+	err := r.conn.QueryRow(context.Background(), query, email).Scan(&user.ID, &user.Email, &user.RoleID, &user.PasswordHash, &user.CreatedAt, &user.Status)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get user by email: %w", err)
 	}
@@ -65,9 +65,9 @@ func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
-	query := `Select id, email, username, role_id, created_at, updated_at,status_id FROM users Where id = $1;`
+	query := `Select id, email, role_id, created_at, updated_at,status_id FROM users Where id = $1;`
 	var user model.User
-	err := r.conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Email, &user.Username, &user.RoleID, &user.CreatedAt, &user.UpdatedAt, &user.Status)
+	err := r.conn.QueryRow(context.Background(), query, id).Scan(&user.ID, &user.Email, &user.RoleID, &user.CreatedAt, &user.UpdatedAt, &user.Status)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get user by ID: %w", err)
 	}
@@ -75,8 +75,8 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
-	query := `UPDATE users SET email=$1, username=$2, role_id=$3, status_id=$4, updated_at=$5 WHERE id=$6;`
-	_, err := r.conn.Exec(context.Background(), query, user.Email, user.Username, user.RoleID, user.Status, time.Now(), user.ID)
+	query := `UPDATE users SET email=$1, role_id=$3, status_id=$4, updated_at=$5 WHERE id=$6;`
+	_, err := r.conn.Exec(context.Background(), query, user.Email, user.RoleID, user.Status, time.Now(), user.ID)
 	if err != nil {
 		return fmt.Errorf("Failed to update user: %w", err)
 	}

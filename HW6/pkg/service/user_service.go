@@ -28,10 +28,9 @@ func (r *UserService) GetCurrentUser(id int) (*model.MeResponse, error) {
 		return nil, err
 	}
 	return &model.MeResponse{
-		ID:       user.ID,
-		Email:    user.Email,
-		Username: user.Username,
-		Role:     user.RoleID,
+		ID:    user.ID,
+		Email: user.Email,
+		Role:  user.RoleID,
 	}, nil
 }
 

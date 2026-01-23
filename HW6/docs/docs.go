@@ -618,9 +618,6 @@ const docTemplate = `{
                 },
                 "role_id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -706,9 +703,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updated_at": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

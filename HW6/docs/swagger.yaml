@@ -50,8 +50,6 @@ definitions:
         type: string
       role_id:
         type: integer
-      username:
-        type: string
     type: object
   model.RegisterResponse:
     properties:
@@ -107,8 +105,6 @@ definitions:
       status:
         type: integer
       updated_at:
-        type: string
-      username:
         type: string
     type: object
 host: localhost:8080
