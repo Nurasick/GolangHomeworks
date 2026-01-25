@@ -48,9 +48,9 @@ function LoginPage() {
                 </div>
                 <button type = "submit" className="
                 mt-6 w-full py-2 rounded-lg
-                bg-gradient-to-r from-indigo-500 to-purple-500
+                bg-gradient-to-r from-indigo-500 to-indigo-500
                 text-white font-medium
-                hover:opacity-90
+                hover:opacity-75
                 hover:scale-[1.02]
                 cursor-pointer
                 transition
