@@ -1,17 +1,11 @@
 basePath: /
 definitions:
-  model.Attendance:
+  model.AttendanceRequest:
     properties:
-      id:
-        type: integer
       student_id:
         type: integer
-      student_name:
-        type: string
       subject_id:
         type: integer
-      subject_name:
-        type: string
       visit_day:
         type: string
       visited:
@@ -41,6 +35,15 @@ definitions:
         type: string
       password:
         type: string
+    type: object
+  model.MeResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        type: integer
     type: object
   model.RegisterRequest:
     properties:
@@ -77,6 +80,55 @@ definitions:
       teacher_id:
         type: integer
     type: object
+  model.ScheduleRequest:
+    properties:
+      day_of_week:
+        type: integer
+      ends_at:
+        type: string
+      group_id:
+        type: integer
+      starts_at:
+        type: string
+      subject_id:
+        type: integer
+      teacher_id:
+        type: integer
+    type: object
+  model.Student:
+    properties:
+      birth_date:
+        type: string
+      gender:
+        type: string
+      group_id:
+        type: integer
+      group_name:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+      year:
+        type: integer
+    type: object
+  model.StudentRequest:
+    properties:
+      birth_date:
+        type: string
+      gender:
+        type: string
+      group_id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+      year:
+        type: integer
+    type: object
   model.StudentResponse:
     properties:
       birth_date:
@@ -92,20 +144,25 @@ definitions:
       name:
         type: string
     type: object
-  model.User:
+  model.Teacher:
     properties:
-      created_at:
-        type: string
-      email:
+      department:
         type: string
       id:
         type: integer
-      role_id:
-        type: integer
-      status:
-        type: integer
-      updated_at:
+      name:
         type: string
+      user_id:
+        type: integer
+    type: object
+  model.TeacherRequest:
+    properties:
+      department:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -195,7 +252,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/model.Attendance'
+          $ref: '#/definitions/model.AttendanceRequest'
       produces:
       - application/json
       responses:
@@ -290,6 +347,42 @@ paths:
       summary: Register a new user
       tags:
       - Auth
+  /schedule:
+    post:
+      consumes:
+      - application/json
+      description: Add schedule for a group with teacher and subject
+      parameters:
+      - description: Schedule Info
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/model.ScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Schedule'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new class schedule
+      tags:
+      - Schedules
   /schedule/all_class_schedule:
     get:
       description: Retrieve all schedules
@@ -354,6 +447,42 @@ paths:
       summary: Get group schedule
       tags:
       - Schedules
+  /student:
+    post:
+      consumes:
+      - application/json
+      description: Create a new student with user and group mapping
+      parameters:
+      - description: Student Info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.StudentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Student'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new student
+      tags:
+      - Student
   /student/{id}:
     get:
       description: Retrieve student information by user ID
@@ -386,7 +515,42 @@ paths:
       - Bearer: []
       summary: Get student by ID
       tags:
-      - Students
+      - Student
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing user
+      parameters:
+      - description: Student Info
+        in: body
+        name: student
+        required: true
+        schema:
+          $ref: '#/definitions/model.StudentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Student'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update an existing student student
+      tags:
+      - Student
   /student/{id}/attendance:
     get:
       description: Get attendance records for the current student
@@ -421,7 +585,76 @@ paths:
       - Bearer: []
       summary: Get student attendance
       tags:
-      - Students
+      - Student
+  /teacher:
+    post:
+      consumes:
+      - application/json
+      description: Add a teacher and link to a user
+      parameters:
+      - description: Teacher Info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.TeacherRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Teacher'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new teacher
+      tags:
+      - Teacher
+  /teacher/{id}:
+    get:
+      description: Get teacher by its id
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Teacher'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get teacher by id
+      tags:
+      - Teacher
   /users/me:
     get:
       description: Get the authenticated user's profile information
@@ -431,7 +664,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/model.MeResponse'
         "401":
           description: Unauthorized
           schema:

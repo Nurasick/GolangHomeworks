@@ -7,7 +7,7 @@ import (
 )
 
 type ScheduleServiceInterface interface {
-	CreateSchedule(schedule *model.Schedule) (*model.Schedule, error)
+	CreateSchedule(schedule *model.ScheduleRequest) (*model.Schedule, error)
 	GetSchedulesByGroupID(groupID int) ([]model.Schedule, error)
 	GetAllSchedule() ([]model.Schedule, error)
 }
@@ -24,9 +24,18 @@ func NewScheduleService(
 	}
 }
 
-func (r *ScheduleService) CreateSchedule(schedule *model.Schedule) (*model.Schedule, error) {
-	if schedule.Day < 0 || schedule.Day > 7 {
+func (r *ScheduleService) CreateSchedule(scheduleRequest *model.ScheduleRequest) (*model.Schedule, error) {
+	if scheduleRequest.Day < 0 || scheduleRequest.Day > 7 {
 		return nil, errors.New("Invalid day of the week")
+	}
+
+	schedule := &model.Schedule{
+		SubjectID: scheduleRequest.SubjectID,
+		GroupID:   scheduleRequest.GroupID,
+		Day:       scheduleRequest.Day,
+		StartsAt:  scheduleRequest.StartsAt,
+		EndsAt:    scheduleRequest.EndsAt,
+		TeacherID: scheduleRequest.TeacherID,
 	}
 	scheduleID, err := r.ScheduleRepo.CreateSchedule(schedule)
 	if err != nil {

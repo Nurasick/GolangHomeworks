@@ -1,11 +1,10 @@
 package handler
 
 import (
-	"net/http"
-	"university/model"
+	//"net/http"
+	//"university/model"
 	"university/pkg/service"
-
-	"github.com/labstack/echo/v4"
+	//"github.com/labstack/echo/v4"
 )
 
 type AdminHandler struct {
@@ -30,6 +29,7 @@ func NewAdminHandler(
 	}
 }
 
+/*
 func (h *AdminHandler) CreateStudent(c echo.Context) error {
 	var req model.Student
 	if err := c.Bind(&req); err != nil {
@@ -43,21 +43,24 @@ func (h *AdminHandler) CreateStudent(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, echo.Map{"data": student})
 }
+*/
 
+/*
 func (h *AdminHandler) CreateTeacher(c echo.Context) error {
 	var req model.Teacher
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid body"})
 	}
 
-	teacher, err := h.TeacherService.CreateTeacher(&req)
+	teacher, err := h.TeacherService.CreateTeacher(req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusCreated, echo.Map{"data": teacher})
 }
-
+*/
+/*
 func (h *AdminHandler) CreateSubject(c echo.Context) error {
 	var req model.Subject
 	if err := c.Bind(&req); err != nil {
@@ -73,3 +76,4 @@ func (h *AdminHandler) CreateSubject(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, echo.Map{"data": schedule})
 }
+*/

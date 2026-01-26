@@ -150,7 +150,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Attendance"
+                            "$ref": "#/definitions/model.AttendanceRequest"
                         }
                     }
                 ],
@@ -289,6 +289,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/schedule": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Add schedule for a group with teacher and subject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Create a new class schedule",
+                "parameters": [
+                    {
+                        "description": "Schedule Info",
+                        "name": "schedule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ScheduleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Schedule"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/schedule/all_class_schedule": {
             "get": {
                 "security": [
@@ -390,6 +447,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/student": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new student with user and group mapping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student"
+                ],
+                "summary": "Create a new student",
+                "parameters": [
+                    {
+                        "description": "Student Info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.StudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Student"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/student/{id}": {
             "get": {
                 "security": [
@@ -402,7 +516,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Students"
+                    "Student"
                 ],
                 "summary": "Get student by ID",
                 "parameters": [
@@ -440,6 +554,61 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student"
+                ],
+                "summary": "Update an existing student student",
+                "parameters": [
+                    {
+                        "description": "Student Info",
+                        "name": "student",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.StudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Student"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/student/{id}/attendance": {
@@ -454,7 +623,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Students"
+                    "Student"
                 ],
                 "summary": "Get student attendance",
                 "parameters": [
@@ -497,6 +666,115 @@ const docTemplate = `{
                 }
             }
         },
+        "/teacher": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Add a teacher and link to a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teacher"
+                ],
+                "summary": "Create a new teacher",
+                "parameters": [
+                    {
+                        "description": "Teacher Info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TeacherRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Teacher"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/teacher/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get teacher by its id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teacher"
+                ],
+                "summary": "Get teacher by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Teacher"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/me": {
             "get": {
                 "security": [
@@ -516,7 +794,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.MeResponse"
                         }
                     },
                     "401": {
@@ -542,23 +820,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.Attendance": {
+        "model.AttendanceRequest": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "student_id": {
                     "type": "integer"
                 },
-                "student_name": {
-                    "type": "string"
-                },
                 "subject_id": {
                     "type": "integer"
-                },
-                "subject_name": {
-                    "type": "string"
                 },
                 "visit_day": {
                     "type": "string"
@@ -604,6 +873,20 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "model.MeResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "integer"
                 }
             }
         },
@@ -661,6 +944,81 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ScheduleRequest": {
+            "type": "object",
+            "properties": {
+                "day_of_week": {
+                    "type": "integer"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "starts_at": {
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "integer"
+                },
+                "teacher_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Student": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "group_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.StudentRequest": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.StudentResponse": {
             "type": "object",
             "properties": {
@@ -684,26 +1042,34 @@ const docTemplate = `{
                 }
             }
         },
-        "model.User": {
+        "model.Teacher": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
+                "department": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "role_id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "updated_at": {
+                "name": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.TeacherRequest": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         }

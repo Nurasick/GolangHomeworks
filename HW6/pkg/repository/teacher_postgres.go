@@ -24,7 +24,7 @@ func NewTeacherRepository(conn *pgx.Conn) *TeacherRepository {
 }
 
 func (r *TeacherRepository) CreateTeacher(teacher *model.Teacher) (int, error) {
-	query := `insert into teachers (name,department,user_id)
+	query := `insert into teachers (full_name,department,user_id)
 	values ($1,$2,$3) returning id;`
 
 	var id int
@@ -35,8 +35,8 @@ func (r *TeacherRepository) CreateTeacher(teacher *model.Teacher) (int, error) {
 	return id, nil
 }
 
-func (r *TeacherRepository) GetTeacherByID(id int) (model.Teacher, error) {
-	query := `select id, name, department, user_id from teachers where id=$1;`
+func (r *TeacherRepository) GetTeacherByID(id int) (*model.Teacher, error) {
+	query := `select id, full_name, department, user_id from teachers where id=$1;`
 
 	var teacher model.Teacher
 	err := r.conn.QueryRow(context.Background(), query, id).Scan(
@@ -46,13 +46,13 @@ func (r *TeacherRepository) GetTeacherByID(id int) (model.Teacher, error) {
 		&teacher.UserId,
 	)
 	if err != nil {
-		return model.Teacher{}, errors.New("Failed to get a teacher by ID: " + err.Error())
+		return nil, errors.New("Failed to get a teacher by ID: " + err.Error())
 	}
-	return teacher, nil
+	return &teacher, nil
 }
 
-func (r *TeacherRepository) GetTeacherByUserID(userID int) (model.Teacher, error) {
-	query := `select id, name, department, user_id from teachers where user_id=$1;`
+func (r *TeacherRepository) GetTeacherByUserID(userID int) (*model.Teacher, error) {
+	query := `select id, full_name, department, user_id from teachers where user_id=$1;`
 	var teacher model.Teacher
 	err := r.conn.QueryRow(context.Background(), query, userID).Scan(
 		&teacher.ID,
@@ -61,14 +61,14 @@ func (r *TeacherRepository) GetTeacherByUserID(userID int) (model.Teacher, error
 		&teacher.UserId,
 	)
 	if err != nil {
-		return model.Teacher{}, errors.New("Failed to get a teacher by userID: " + err.Error())
+		return nil, errors.New("Failed to get a teacher by userID: " + err.Error())
 	}
-	return teacher, nil
+	return &teacher, nil
 
 }
 
 func (r *TeacherRepository) GetAllTeachers() ([]model.Teacher, error) {
-	query := `select id, name, department, user_id from teachers`
+	query := `select id, fuLL_name, department, user_id from teachers`
 	var teachers []model.Teacher
 	rows, err := r.conn.Query(context.Background(), query)
 	if err != nil {

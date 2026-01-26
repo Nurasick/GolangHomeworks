@@ -6,3 +6,8 @@ type Teacher struct {
 	Department string `json:"department"`
 	UserId     int    `json:"user_id"`
 }
+type TeacherRequest struct {
+	Name       string `json:"name"`
+	Department string `json:"department"`
+	UserId     int    `json:"user_id"`
+}

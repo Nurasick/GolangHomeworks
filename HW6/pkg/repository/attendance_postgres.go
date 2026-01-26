@@ -10,11 +10,11 @@ import (
 )
 
 type AttendanceRepositoryInterface interface {
-	MarkAttendance(attendance model.Attendance) error
+	MarkAttendance(attendance *model.Attendance) error
 	GetAttendanceByStudentID(studentID int) ([]model.Attendance, error)
 	GetAttendanceBySubjectID(subjectID int) ([]model.Attendance, error)
 	GetAttendanceByGroupIDandDate(groupID int, date time.Time) ([]model.Attendance, error)
-	Exists(studentID, subjectID int, visitDay time.Time) (model.Attendance, error)
+	Exists(studentID, subjectID int, visitDay time.Time) (*model.Attendance, error)
 }
 
 type AttendanceRepository struct {
@@ -25,13 +25,13 @@ func NewAttendanceRepository(conn *pgx.Conn) *AttendanceRepository {
 	return &AttendanceRepository{conn: conn}
 }
 
-func (r *AttendanceRepository) MarkAttendance(attendance model.Attendance) error {
+func (r *AttendanceRepository) MarkAttendance(attendance *model.Attendance) error {
 	query := `
 	insert into attendance(student_id, subject_id, visit_day, visited)
 	values($1, $2, $3, $4);
 	`
 
-	err := r.conn.QueryRow(context.Background(), query, attendance.StudentID, attendance.SubjectID, attendance.VisitDay, attendance.Visited).Scan()
+	_, err := r.conn.Exec(context.Background(), query, attendance.StudentID, attendance.SubjectID, attendance.VisitDay, attendance.Visited)
 	if err != nil {
 		return errors.New("Failed to mark attendance: " + err.Error())
 	}
@@ -114,7 +114,7 @@ func (r *AttendanceRepository) GetAttendanceByGroupIDandDate(groupID int, date t
 	return attendances, nil
 }
 
-func (r *AttendanceRepository) Exists(studentID, subjectID int, visitDay time.Time) (model.Attendance, error) {
+func (r *AttendanceRepository) Exists(studentID, subjectID int, visitDay time.Time) (*model.Attendance, error) {
 	query := `
 	select a.id, a.student_id, s.name, a.subject_id, sub.name, a.visit_day, a.visited from attendance a
 	join students s on a.student_id = s.id
@@ -124,7 +124,10 @@ func (r *AttendanceRepository) Exists(studentID, subjectID int, visitDay time.Ti
 	var attendance model.Attendance
 	err := r.conn.QueryRow(context.Background(), query, studentID, subjectID, visitDay).Scan(&attendance.ID, &attendance.StudentID, &attendance.StudentName, &attendance.SubjectID, &attendance.SubjectName, &attendance.VisitDay, &attendance.Visited)
 	if err != nil {
-		return model.Attendance{}, errors.New("Failed to get attendance by several params: " + err.Error())
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, errors.New("Failed to get attendance by several params: " + err.Error())
 	}
-	return attendance, nil
+	return &attendance, nil
 }

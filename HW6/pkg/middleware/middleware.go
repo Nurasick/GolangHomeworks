@@ -16,6 +16,10 @@ func JWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		if auth == "" {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Missing Authorization header"}) //checking if header is present
 		}
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = "Bearer " + auth
+		}
+
 		parts := strings.Split(auth, " ")            //splitting the header to get the token
 		if len(parts) != 2 || parts[0] != "Bearer" { //validating the format of the header
 			fmt.Println("Invalid Authorization header format:", auth)

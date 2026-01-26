@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 	"university/model"
 	"university/pkg/service"
 
@@ -23,19 +24,26 @@ func NewAttendanceHandler(attendanceService service.AttendanceServiceInterface) 
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param body body model.Attendance true "Attendance Record"
+// @Param body body model.AttendanceRequest true "Attendance Record"
 // @Success 201 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /attendance/subject [post]
 func (h *AttendanceHandler) MarkAttendance(c echo.Context) error {
-	var req model.Attendance
+	var req model.AttendanceRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid body"})
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid body" + err.Error()})
+	}
+
+	visitDay, err := time.Parse("2006-01-02", req.VisitDay)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "visit_day must be YYYY-MM-DD",
+		})
 	}
 	//roleID := c.Get("RoleID").(int)
 
-	err := h.AttendanceService.MarkAttendance(req.StudentID, req.SubjectID, 1, req.VisitDay, req.Visited)
+	err = h.AttendanceService.MarkAttendance(req.StudentID, req.SubjectID, 1, visitDay, req.Visited)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
@@ -82,7 +90,7 @@ func (h *AttendanceHandler) GetAttendanceByStudentID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid studentID"})
 	}
 
-	data, err := h.AttendanceService.GetAttendanceBySubjectID(studentID)
+	data, err := h.AttendanceService.GetAttendanceByStudentID(studentID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}

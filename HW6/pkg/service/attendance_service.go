@@ -32,7 +32,6 @@ func NewAttendanceService(
 }
 
 func (r *AttendanceService) MarkAttendance(studentID, subjectID, roleID int, visitDay time.Time, visited bool) error {
-	var attendance model.Attendance
 	if roleID != 1 && roleID != 2 {
 		return errors.New("forbidden: insufficient permissions")
 	}
@@ -44,13 +43,21 @@ func (r *AttendanceService) MarkAttendance(studentID, subjectID, roleID int, vis
 	if err != nil {
 		return errors.New("Subject not found: " + err.Error())
 	}
-	attendance, err = r.attendanceRepo.Exists(studentID, subjectID, visitDay)
+	attendanceExist, err := r.attendanceRepo.Exists(studentID, subjectID, visitDay)
 	if err != nil {
+
 		return errors.New("failed to get attendance: " + err.Error())
 	}
 
-	if attendance.ID != 0 {
+	if attendanceExist != nil && attendanceExist.ID != 0 {
 		return errors.New("attendance already marked for that day")
+	}
+
+	attendance := &model.Attendance{
+		StudentID: studentID,
+		SubjectID: subjectID,
+		VisitDay:  visitDay,
+		Visited:   visited,
 	}
 	return r.attendanceRepo.MarkAttendance(attendance)
 }
@@ -67,7 +74,7 @@ func (r *AttendanceService) GetAttendanceBySubjectID(subjectID int) ([]model.Att
 			ID:          record.ID,
 			StudentName: record.StudentName,
 			SubjectName: record.SubjectName,
-			VisitDay:    record.VisitDay,
+			VisitDay:    record.VisitDay.Format("2006-01-02"),
 			Visited:     record.Visited,
 		})
 	}
@@ -86,7 +93,7 @@ func (r *AttendanceService) GetAttendanceByStudentID(subjectID int) ([]model.Att
 			ID:          record.ID,
 			StudentName: record.StudentName,
 			SubjectName: record.SubjectName,
-			VisitDay:    record.VisitDay,
+			VisitDay:    record.VisitDay.Format("2006-01-02"),
 			Visited:     record.Visited,
 		})
 	}

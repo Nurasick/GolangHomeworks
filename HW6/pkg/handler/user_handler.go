@@ -24,7 +24,7 @@ func NewUserHandler(userService service.UserServiceInterface) *UserHandler {
 // @Tags Users
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} model.User
+// @Success 200 {object} model.MeResponse
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /users/me [get]

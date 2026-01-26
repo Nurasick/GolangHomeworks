@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"university/config"
 	_ "university/docs" // Import docs for swagger
 	"university/helpers/db"
 	"university/pkg/handler"
@@ -22,9 +23,11 @@ import (
 // @in header
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
-// @security Bearer
 func main() {
-	db.Connect("postgres://postgres:1234@localhost:5432/university")
+
+	cfg := config.Load()
+
+	db.Connect(cfg.DBUrl)
 	defer db.Conn.Close(context.Background())
 
 	// Initialize repositories
@@ -32,14 +35,14 @@ func main() {
 	studentRepo := repository.NewStudentRepository(db.Conn)
 	scheduleRepo := repository.NewScheduleRepository(db.Conn)
 	attendanceRepo := repository.NewAttendanceRepository(db.Conn)
-	//teacherRepo := repository.NewTeacherRepository(db.Conn)
+	teacherRepo := repository.NewTeacherRepository(db.Conn)
 	subjectRepo := repository.NewSubjectRepository(db.Conn)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo)
 	userService := service.NewUserService(userRepo)
 	studentService := service.NewStudentService(studentRepo, userRepo, attendanceRepo)
-	//teacherService := service.NewTeacherService(*teacherRepo, *userRepo, *scheduleRepo)
+	teacherService := service.NewTeacherService(*teacherRepo, *userRepo, *scheduleRepo)
 	scheduleService := service.NewScheduleService(scheduleRepo)
 	attendanceService := service.NewAttendanceService(attendanceRepo, studentRepo, subjectRepo)
 
@@ -47,7 +50,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService)
 	studentHandler := handler.NewStudentHandler(studentService)
-	//teacherHandler := handler.NewTeacherHandler(teacherService, attendanceService)
+	teacherHandler := handler.NewTeacherHandler(teacherService, attendanceService)
 	scheduleHandler := handler.NewScheduleHandler(scheduleService)
 	attendanceHandler := handler.NewAttendanceHandler(attendanceService)
 	//adminHandler := handler.NewAdminHandler(userService, studentService, teacherService, scheduleService)
@@ -69,11 +72,16 @@ func main() {
 	studentRoutes := e.Group("/student", jmtMW)
 	studentRoutes.GET("/:id", studentHandler.GetStudentByID)
 	studentRoutes.GET("/:id/attendance", studentHandler.MyAttendance)
+	studentRoutes.POST("", studentHandler.CreateStudent)
+	studentRoutes.PATCH("/:id", studentHandler.UpdateStudent)
 
 	// Teacher routes
-
+	teacherRoutes := e.Group("/teacher", jmtMW)
+	teacherRoutes.GET("/:id", teacherHandler.GetTeacherByID)
+	teacherRoutes.POST("", teacherHandler.CreateTeacher)
 	// Schedule routes
 	scheduleRoutes := e.Group("/schedule", jmtMW)
+	scheduleRoutes.POST("", scheduleHandler.CreateSchedule)
 	scheduleRoutes.GET("/all_class_schedule", scheduleHandler.GetAllSchedules)
 	scheduleRoutes.GET("/group/:id", scheduleHandler.GetScheduleByGroupID)
 
@@ -91,5 +99,5 @@ func main() {
 		adminRoutes.POST("/teachers", adminHandler.CreateTeacher)
 		adminRoutes.POST("/subjects", adminHandler.CreateSubject)
 	*/
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":" + cfg.Port))
 }

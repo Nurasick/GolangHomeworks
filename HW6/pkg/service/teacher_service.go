@@ -7,8 +7,9 @@ import (
 )
 
 type TeacherServiceInterface interface {
-	CreateTeacher(teacher *model.Teacher) (*model.Teacher, error)
+	CreateTeacher(teacher *model.TeacherRequest) (*model.Teacher, error)
 	GetScheduleByTeacherID(id int) ([]model.Schedule, error)
+	GetTeacherByID(id int) (*model.Teacher, error)
 }
 
 type TeacherService struct {
@@ -29,7 +30,7 @@ func NewTeacherService(
 	}
 }
 
-func (r *TeacherService) CreateTeacher(teacher *model.Teacher) (*model.Teacher, error) {
+func (r *TeacherService) CreateTeacher(teacher *model.TeacherRequest) (*model.Teacher, error) {
 	userID := teacher.UserId
 	user, err := r.userRepo.GetUserByID(userID)
 	if err != nil || user == nil {
@@ -38,12 +39,17 @@ func (r *TeacherService) CreateTeacher(teacher *model.Teacher) (*model.Teacher, 
 	if user.RoleID != 2 {
 		return nil, errors.New("User is not a teacher")
 	}
-	teacherID, err := r.teacherRepo.CreateTeacher(teacher)
+	teach := &model.Teacher{
+		UserId:     teacher.UserId,
+		Name:       teacher.Name,
+		Department: teacher.Department,
+	}
+	teacherID, err := r.teacherRepo.CreateTeacher(teach)
 	if err != nil {
 		return nil, errors.New("Failed to create a teacher: " + err.Error())
 	}
-	teacher.ID = teacherID
-	return teacher, nil
+	teach.ID = teacherID
+	return teach, nil
 }
 
 func (r *TeacherService) GetScheduleByTeacherID(id int) ([]model.Schedule, error) {
@@ -56,4 +62,11 @@ func (r *TeacherService) GetScheduleByTeacherID(id int) ([]model.Schedule, error
 		return nil, errors.New("Failed to get schedule by teacher ID: " + err.Error())
 	}
 	return schedules, nil
+}
+func (r *TeacherService) GetTeacherByID(id int) (*model.Teacher, error) {
+	teacher, err := r.teacherRepo.GetTeacherByID(id)
+	if err != nil {
+		return nil, errors.New("Failed to get teacher: " + err.Error())
+	}
+	return teacher, err
 }

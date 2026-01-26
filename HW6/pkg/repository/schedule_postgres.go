@@ -27,8 +27,8 @@ func NewScheduleRepository(conn *pgx.Conn) *ScheduleRepository {
 
 func (r *ScheduleRepository) CreateSchedule(schedule *model.Schedule) (int, error) {
 	query := `
-	insert into schedule(group_id, subject_id, day_of_week, starts_at, ends_at, teacher_id)
-	values($1, $2, $3, $4, $5, $6);
+	insert into class_schedule(group_id, subject_id, day_of_week, starts_at, ends_at, teacher_id)
+	values($1, $2, $3, $4, $5, $6)returning id;
 	`
 	var id int
 

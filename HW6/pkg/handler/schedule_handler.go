@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"university/model"
 	"university/pkg/service"
 
 	"github.com/labstack/echo/v4"
@@ -57,4 +58,28 @@ func (h *ScheduleHandler) GetAllSchedules(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, data)
+}
+
+// @Summary Create a new class schedule
+// @Description Add schedule for a group with teacher and subject
+// @Tags Schedules
+// @Accept json
+// @Produce json
+// @Param schedule body model.ScheduleRequest true "Schedule Info"
+// @Success 201 {object} model.Schedule
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security Bearer
+// @Router /schedule [post]
+func (h *ScheduleHandler) CreateSchedule(c echo.Context) error {
+	var req model.ScheduleRequest
+	if err := c.Bind(&req); err != nil { //binding the request body to struct
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request: " + err.Error()})
+	}
+	schedule, err := h.ScheduleService.CreateSchedule(&req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+	return c.JSON(http.StatusCreated, schedule)
+
 }
